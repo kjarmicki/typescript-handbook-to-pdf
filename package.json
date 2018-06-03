@@ -1,0 +1,23 @@
+{
+  "name": "typescript-handbook-to-pdf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "parcel watch --target=node src/index.ts",
+    "build": "parcel build --target=node src/index.ts",
+    "execute": "node dist/index",
+    "start": "npm run build && npm run execute"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel-bundler": "1.8.1",
+    "typescript": "2.9.1"
+  },
+  "dependencies": {
+    "@types/execa": "0.9.0",
+    "execa": "0.10.0"
+  }
+}
