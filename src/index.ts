@@ -7,10 +7,17 @@ import createFiles, { Files } from './files';
 import makePdf from './pdf';
 
 (async () => {
-    const githubClient: GithubClient = createGithubClient(execa, console.log);
+    const cwd = process.cwd();
+    const githubClient: GithubClient = createGithubClient(execa);
     const files: Files = createFiles(fs);
+    const { log } = console;
+
+    log('Cloning handbook repo...');
     const clonedRepoDir: string = 
-        await githubClient.clone('Microsoft/TypeScript-Handbook', path.join(process.cwd(), 'temp'));
+        await githubClient.clone('Microsoft/TypeScript-Handbook', path.join(cwd, 'temp'));
+    log('Done');
     const markdownFiles: string[] = files.findMarkdown(path.join(clonedRepoDir, 'pages'));
-    console.log(markdownFiles);
+    log('Creating pdf...');
+    await makePdf(mpdf().concat, markdownFiles, path.join(cwd, 'handbook.pdf')); // fixme: type declaration needs proper export
+    log('Done');
 })();
