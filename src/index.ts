@@ -18,6 +18,6 @@ import makePdf from './pdf';
     log('Done');
     const markdownFiles: string[] = files.findMarkdown(path.join(clonedRepoDir, 'pages'));
     log('Creating pdf...');
-    await makePdf(mpdf().concat, markdownFiles, path.join(cwd, 'handbook.pdf')); // fixme: type declaration needs proper export
+    await makePdf(mpdf().concat, markdownFiles, path.join(cwd, 'handbook.pdf'));
     log('Done');
 })();

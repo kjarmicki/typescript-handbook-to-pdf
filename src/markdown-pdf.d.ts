@@ -1,15 +1,17 @@
 declare module 'markdown-pdf' {
-    interface MarkdownPdf {
+    export interface MarkdownPdf {
         (): MarkdownPdfFrom
         concat: MarkdownPdfFrom
     }
-    interface MarkdownPdfFrom {
+    export interface MarkdownPdfFrom {
         from(mdFiles: string | string[]) : MarkdownPdfTo
     }
-    interface MarkdownPdfTo {
+    export interface MarkdownPdfTo {
         to(
             pdfFiles: string | string[],
             callback: () => void
         ): void
     }
+
+    export default function markdownPdf(): MarkdownPdf
 }
