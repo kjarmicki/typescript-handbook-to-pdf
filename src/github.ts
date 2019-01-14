@@ -7,7 +7,7 @@ export interface GithubClient {
 
 export default function createGithubClient(execa: ExecaStatic): GithubClient {
     function buildUrl(repo: string): string {
-        return `git@github.com:${repo}.git`;
+        return `https://github.com/${repo}.git`;
     }
 
     function directoryFromRepo(repo: string): string {
