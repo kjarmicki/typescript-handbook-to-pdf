@@ -1,4 +1,5 @@
 import { ExecaStatic, ExecaReturns } from 'execa';
+import fs from 'fs';
 import path from 'path';
 
 export interface GithubClient {
@@ -18,10 +19,25 @@ export default function createGithubClient(execa: ExecaStatic): GithubClient {
         return dir;
     }
 
+    // Based on https://stackoverflow.com/a/32197381/613130
+    function deleteFolderRecursiveSync(p: string): void {
+        if (fs.existsSync(p)) {
+            fs.readdirSync(p).forEach((file: string, index: number) => {
+                const curPath = path.join(p, file);
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    deleteFolderRecursiveSync(curPath);
+                } else { // delete file
+                    fs.unlinkSync(curPath);
+                }
+            });
+            fs.rmdirSync(p);
+        }
+    }
+
     return {
         async clone(repo, cwd) {
-            await execa('rm', ['-rf', cwd]);
-            await execa('mkdir', [cwd]);
+            deleteFolderRecursiveSync(cwd);
+            fs.mkdirSync(cwd);
             await execa('git', ['clone', buildUrl(repo)], {
                 cwd
             });
