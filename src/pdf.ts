@@ -1,10 +1,10 @@
-import { MarkdownPdfFrom } from 'markdown-pdf';
+import {ConcatOptionsBuilder} from 'markdown-pdf';
 
 export default async function makePdf(
-    concat: MarkdownPdfFrom,
-    files: string[],
-    output: string): Promise<void> {
-        return new Promise<void>(resolve => {
-            return concat.from(files).to(output, resolve);
-        });
-    }
+  concat: ConcatOptionsBuilder,
+  files: string[],
+  output: string): Promise<void> {
+    return new Promise<void>(resolve => {
+      concat.from.paths(files, {}).to(output, resolve);
+    });
+  }

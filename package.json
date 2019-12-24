@@ -1,27 +1,27 @@
 {
   "name": "typescript-handbook-to-pdf",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "A tool allowing for download of the TypeScript Handbook as PDF",
   "main": "index.js",
   "scripts": {
-    "watch": "parcel watch --public-url ./ --target=node src/index.ts",
-    "build": "parcel build --public-url ./ --target=node src/index.ts",
-    "execute": "node dist/index",
-    "start": "npm run build && npm run execute",
-    "debug": "node --inspect-brk --require ts-node/register src/index.ts"
+    "start": "ts-node --files src/index.ts",
+    "debug": "ndb --require ts-node/register src/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@types/execa": "0.9.0",
-    "@types/node": "10.3.0",
-    "parcel-bundler": "1.10.0",
-    "ts-node": "6.1.0",
-    "typescript": "2.9.1"
-  },
   "dependencies": {
-    "execa": "0.10.0",
-    "markdown-pdf": "8.1.1"
+    "@types/cheerio": "0.22.15",
+    "@types/markdown-pdf": "9.0.0",
+    "@types/node": "13.1.0",
+    "@types/node-fetch": "2.5.4",
+    "@types/rimraf": "2.0.3",
+    "cheerio": "1.0.0-rc.3",
+    "execa": "4.0.0",
+    "markdown-pdf": "10.0.0",
+    "node-fetch": "2.6.0",
+    "rimraf": "3.0.0",
+    "ts-node": "8.5.4",
+    "typescript": "3.7.4"
   }
 }

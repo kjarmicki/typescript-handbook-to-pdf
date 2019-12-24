@@ -1,23 +1,32 @@
-import path from 'path';
-import fs from 'fs';
-import execa from 'execa';
-import mpdf from 'markdown-pdf';
-import createGithubClient, { GithubClient } from './github';
-import createFiles, { Files } from './files';
+import {join} from 'path';
+import * as execa from 'execa';
+import {promises} from 'fs';
+import {promisify} from 'util';
+import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
+import * as mpdf from 'markdown-pdf';
+import * as rimraf from 'rimraf';
+import WebsiteChaptersOrder from './website-chapters-order';
+import Files from './files';
+import GithubClient from './github';
 import makePdf from './pdf';
 
 (async () => {
-    const cwd = process.cwd();
-    const githubClient: GithubClient = createGithubClient(execa);
-    const files: Files = createFiles(fs);
-    const { log } = console;
+  const {log} = console;
+  const cwd = process.cwd();
+  const promisedRimraf = promisify(rimraf);
 
-    log('Cloning handbook repo...');
-    const clonedRepoDir: string = 
-        await githubClient.clone('Microsoft/TypeScript-Handbook', path.join(cwd, 'temp'));
-    log('Done');
-    const markdownFiles: string[] = files.findMarkdown(path.join(clonedRepoDir, 'pages'));
-    log('Creating pdf...');
-    await makePdf(mpdf().concat, markdownFiles, path.join(cwd, 'handbook.pdf'));
-    log('Done');
+  const files = new Files(promises, promisedRimraf);
+  const githubClient = new GithubClient(execa, files);
+  const websiteChaptersOrder = new WebsiteChaptersOrder('https://www.typescriptlang.org/docs/home.html', fetch, cheerio);
+
+  log('Cloning the Handbook repo...');
+  const clonedRepoDir: string = await githubClient.clone('Microsoft/TypeScript-Handbook', join(cwd, 'temp'));
+  const markdownFiles: string[] = await files.findMarkdown(join(clonedRepoDir, 'pages'));
+  log('Ordering markdown files according to the website...');
+  const orderedFiles = await websiteChaptersOrder.sort(markdownFiles);
+  log('Creating the pdf...');
+  const pdfPath = join(cwd, 'handbook.pdf');
+  await makePdf(mpdf().concat, orderedFiles, pdfPath);
+  log(`Done, the pdf is available at ${pdfPath}`);
 })();
