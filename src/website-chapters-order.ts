@@ -40,7 +40,7 @@ export default class WebsiteChaptersOrder {
   }
 
   private static normalizeName(name: string): string {
-    return name.split('/').pop()
+    return name.split(/[\\\/]/).pop()
       ?.toLowerCase()
       .replace(/\.(.*)$/, '')
       .replace(/ /g, '-') ?? '';
