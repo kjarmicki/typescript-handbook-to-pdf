@@ -1,8 +1,9 @@
+import {sep} from 'path';
 import _fetch from 'node-fetch';
 import CheerioAPI from 'cheerio';
 
 export default class WebsiteChaptersOrder {
-  private static readonly V1_CHAPTERS_SELECTOR = 'a[href="#toc-handbook"] + ul > li a';
+  private static readonly V1_CHAPTERS_SELECTOR = '#toc-handbook li a';
 
   constructor(
     private readonly websiteUrl: string,
@@ -21,7 +22,7 @@ export default class WebsiteChaptersOrder {
     const links = website$(WebsiteChaptersOrder.V1_CHAPTERS_SELECTOR).toArray();
     return links
       .map((link) => link.attribs.href)
-      .map(WebsiteChaptersOrder.normalizeName)
+      .map((href) => WebsiteChaptersOrder.normalizeName(href, '/'))
       .filter(Boolean);
   }
 
@@ -30,7 +31,7 @@ export default class WebsiteChaptersOrder {
     const orderedChapterFiles: string[] = [];
     for (const orderedName of orderedNames) {
       const matchingChapterIndex = remainingChapterFiles.findIndex(
-        (chapterFile) => WebsiteChaptersOrder.normalizeName(chapterFile) === orderedName
+        (chapterFile) => WebsiteChaptersOrder.normalizeName(chapterFile, sep) === orderedName
       );
       if (matchingChapterIndex) {
         orderedChapterFiles.push(...remainingChapterFiles.splice(matchingChapterIndex, 1));
@@ -39,8 +40,8 @@ export default class WebsiteChaptersOrder {
     return [...orderedChapterFiles, ...remainingChapterFiles];
   }
 
-  private static normalizeName(name: string): string {
-    return name.split('/').pop()
+  private static normalizeName(name: string, separator: string): string {
+    return name.split(separator).pop()
       ?.toLowerCase()
       .replace(/\.(.*)$/, '')
       .replace(/ /g, '-') ?? '';

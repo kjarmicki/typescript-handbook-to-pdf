@@ -18,7 +18,7 @@ import makePdf from './pdf';
 
   const files = new Files(promises, promisedRimraf);
   const githubClient = new GithubClient(execa, files);
-  const websiteChaptersOrder = new WebsiteChaptersOrder('https://www.typescriptlang.org/docs/home.html', fetch, cheerio);
+  const websiteChaptersOrder = new WebsiteChaptersOrder('https://www.typescriptlang.org/docs/handbook/basic-types.html', fetch, cheerio);
 
   log('Cloning the Handbook repo...');
   const clonedRepoDir: string = await githubClient.clone('Microsoft/TypeScript-Handbook', join(cwd, 'temp'));
