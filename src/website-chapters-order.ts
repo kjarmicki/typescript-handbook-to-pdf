@@ -1,6 +1,7 @@
 import {sep} from 'path';
 import _fetch from 'node-fetch';
 import CheerioAPI from 'cheerio';
+import ChapterFile from './chatpter-file';
 
 export default class WebsiteChaptersOrder {
   private static readonly V1_CHAPTERS_SELECTOR = '#toc-handbook li a';
@@ -11,9 +12,9 @@ export default class WebsiteChaptersOrder {
     private readonly cheerio: CheerioAPI
   ) {}
 
-  async sort(this: WebsiteChaptersOrder, files: string[]): Promise<string[]> {
+  async sort(this: WebsiteChaptersOrder, chapterFiles: ChapterFile[]): Promise<ChapterFile[]> {
     const orderedChapterNames = await this.downloadOrderedChaptersFromWebsite();
-    return this.orderChaptersAccordingToNames(orderedChapterNames, files);
+    return this.orderChaptersAccordingToNames(orderedChapterNames, chapterFiles);
   }
 
   private async downloadOrderedChaptersFromWebsite(): Promise<string[]> {
@@ -21,17 +22,17 @@ export default class WebsiteChaptersOrder {
     const website$ = this.cheerio.load(websiteHtml);
     const links = website$(WebsiteChaptersOrder.V1_CHAPTERS_SELECTOR).toArray();
     return links
-      .map((link) => link.attribs.href)
-      .map((href) => WebsiteChaptersOrder.normalizeName(href, '/'))
-      .filter(Boolean);
+      .map((link) => link.attribs.href.split('/').pop())
+      .filter((pathName) => pathName !== undefined)
+      .map((pathName) => WebsiteChaptersOrder.normalizeName(pathName!));
   }
 
-  private orderChaptersAccordingToNames(orderedNames: string[], chapterFiles: string[]): string[] {
+  private orderChaptersAccordingToNames(orderedNames: string[], chapterFiles: ChapterFile[]): ChapterFile[] {
     const remainingChapterFiles = [...chapterFiles];
-    const orderedChapterFiles: string[] = [];
+    const orderedChapterFiles: ChapterFile[] = [];
     for (const orderedName of orderedNames) {
       const matchingChapterIndex = remainingChapterFiles.findIndex(
-        (chapterFile) => WebsiteChaptersOrder.normalizeName(chapterFile, sep) === orderedName
+        (chapterFile) => WebsiteChaptersOrder.normalizeName(chapterFile.getName()) === orderedName
       );
       if (matchingChapterIndex) {
         orderedChapterFiles.push(...remainingChapterFiles.splice(matchingChapterIndex, 1));
@@ -40,10 +41,9 @@ export default class WebsiteChaptersOrder {
     return [...orderedChapterFiles, ...remainingChapterFiles];
   }
 
-  private static normalizeName(name: string, separator: string): string {
-    return name.split(separator).pop()
-      ?.toLowerCase()
+  private static normalizeName(name: string): string {
+    return name.toLowerCase()
       .replace(/\.(.*)$/, '')
-      .replace(/ /g, '-') ?? '';
+      .replace(/ /g, '-');
   }  
 }

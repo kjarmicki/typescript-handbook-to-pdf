@@ -21,10 +21,10 @@ import makePdf from './pdf';
   const websiteChaptersOrder = new WebsiteChaptersOrder('https://www.typescriptlang.org/docs/handbook/basic-types.html', fetch, cheerio);
 
   log('Cloning the Handbook repo...');
-  const clonedRepoDir: string = await githubClient.clone('Microsoft/TypeScript-Handbook', join(cwd, 'temp'));
-  const markdownFiles: string[] = await files.findMarkdown(join(clonedRepoDir, 'pages'));
+  const clonedRepoDir = await githubClient.clone('Microsoft/TypeScript-Handbook', join(cwd, 'temp'));
+  const chapterFiles = await files.findChapters(join(clonedRepoDir, 'pages'));
   log('Ordering markdown files according to the website...');
-  const orderedFiles = await websiteChaptersOrder.sort(markdownFiles);
+  const orderedFiles = await websiteChaptersOrder.sort(chapterFiles);
   log('Creating the pdf...');
   const pdfPath = join(cwd, 'handbook.pdf');
   await makePdf(mpdf().concat, orderedFiles, pdfPath);
